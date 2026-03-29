@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class IngredientRepository {
@@ -23,11 +24,19 @@ public class IngredientRepository {
         ));
     }
 
-    public Ingredient findById(Integer id) {
+    public Optional<Ingredient> findById(int id) {
         String sql = "SELECT id, name, category, price FROM ingredient WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new Ingredient(
-                rs.getInt("id"), rs.getString("name"), rs.getString("category"), rs.getDouble("price")
-        ), id);
+        try {
+            Ingredient ingredient = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new Ingredient(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("category"),
+                    rs.getDouble("price")
+            ), id);
+            return Optional.ofNullable(ingredient);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public StockValue getStockValue(Integer id, Instant at, String unit) {

@@ -36,4 +36,17 @@ public class DishRepository {
             jdbcTemplate.update("INSERT INTO dish_ingredient (id_dish, id_ingredient) VALUES (?, ?)", dishId, ing.getId());
         }
     }
+
+    public void updateAssociations(int dishId, List<Ingredient> ingredients) {
+        String deleteSql = "DELETE FROM dish_ingredient WHERE id_dish = ?";
+        jdbcTemplate.update(deleteSql, dishId);
+
+
+        String insertSql = "INSERT INTO dish_ingredient (id_dish, id_ingredient) " +
+                "SELECT ?, id FROM ingredient WHERE id = ?";
+
+        for (Ingredient ing : ingredients) {
+            jdbcTemplate.update(insertSql, dishId, ing.getId());
+        }
+    }
 }
