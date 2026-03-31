@@ -1,5 +1,6 @@
 package com.td2.td5spring.controller;
 
+import com.td2.td5spring.entity.CreateStockMovement;
 import com.td2.td5spring.entity.Ingredient;
 import com.td2.td5spring.entity.StockMovement;
 import com.td2.td5spring.entity.StockValue;
@@ -66,5 +67,21 @@ public class IngredientController {
                 ));
 
         return stockMovementRepository.findByIngredientIdAndDateRange(id, from, to);
+    }
+
+    @PostMapping("/{id}/stockMovements")
+    public List<StockMovement> addStockMovements(
+            @PathVariable int id,
+            @RequestBody List<CreateStockMovement> movementsToCreate) {
+
+        ingredientRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ingredient.id=" + id + " is not found"
+                ));
+
+        return movementsToCreate.stream()
+                .map(move -> stockMovementRepository.save(id, move))
+                .toList();
     }
 }

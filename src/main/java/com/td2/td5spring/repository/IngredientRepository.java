@@ -1,5 +1,6 @@
 package com.td2.td5spring.repository;
 
+import com.td2.td5spring.entity.CategoryEnum;
 import com.td2.td5spring.entity.Ingredient;
 import com.td2.td5spring.entity.StockValue;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,7 +21,10 @@ public class IngredientRepository {
     public List<Ingredient> findAll() {
         String sql = "SELECT id, name, category, price FROM ingredient";
         return jdbcTemplate.query(sql, (rs, rowNum) -> new Ingredient(
-                rs.getInt("id"), rs.getString("name"), rs.getString("category"), rs.getDouble("price")
+                rs.getInt("id"),
+                rs.getString("name"),
+                CategoryEnum.valueOf(rs.getString("category").toUpperCase()),
+                rs.getDouble("price")
         ));
     }
 
@@ -30,7 +34,7 @@ public class IngredientRepository {
             Ingredient ingredient = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new Ingredient(
                     rs.getInt("id"),
                     rs.getString("name"),
-                    rs.getString("category"),
+                    CategoryEnum.valueOf(rs.getString("category").toUpperCase()),
                     rs.getDouble("price")
             ), id);
             return Optional.ofNullable(ingredient);

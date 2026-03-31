@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CreateStockMovement {
-    private String unit;
+    private UnitEnum unit;
     private Double value;
-    private String type;
+    private MovementTypeEnum type;
 }

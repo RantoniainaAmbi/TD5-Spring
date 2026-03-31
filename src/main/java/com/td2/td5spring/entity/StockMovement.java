@@ -12,7 +12,7 @@ public class StockMovement {
     private Integer id;
     private Integer ingredientId;
     private Double quantity;
-    private String type;
+    private MovementTypeEnum type;
     private Instant creationDatetime;
-    private String unit;
+    private UnitEnum unit;
 }

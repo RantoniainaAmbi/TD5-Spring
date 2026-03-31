@@ -1,6 +1,9 @@
 package com.td2.td5spring.repository;
 
+import com.td2.td5spring.entity.CreateStockMovement;
+import com.td2.td5spring.entity.MovementTypeEnum;
 import com.td2.td5spring.entity.StockMovement;
+import com.td2.td5spring.entity.UnitEnum;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -20,14 +23,29 @@ public class StockMovementRepository {
         String sql = "SELECT id, creation_datetime, unit, quantity, type " +
                 "FROM stock_movement " +
                 "WHERE id_ingredient = ? AND creation_datetime >= ? AND creation_datetime <= ?";
-
         return jdbcTemplate.query(sql, (rs, rowNum) -> new StockMovement(
                 rs.getInt("id"),
                 rs.getInt("id_ingredient"),
                 rs.getDouble("quantity"),
-                rs.getString("type"),
+                MovementTypeEnum.valueOf(rs.getString("type").toUpperCase()), // Conversion String -> Enum
                 rs.getTimestamp("creation_datetime").toInstant(),
-                rs.getString("unit")
+                UnitEnum.valueOf(rs.getString("unit").toUpperCase())          // Conversion String -> Enum
         ), ingredientId, Timestamp.from(from), Timestamp.from(to));
+    }
+
+    public StockMovement save(int ingredientId, CreateStockMovement create) {
+        String sql = "INSERT INTO stock_movement (id_ingredient, unit, quantity, type, creation_datetime) " +
+                "VALUES (?, ?, ?, ?, ?) RETURNING id, creation_datetime";
+
+        Instant now = Instant.now();
+
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> new StockMovement(
+                rs.getInt("id"),
+                ingredientId,
+                create.getValue(),
+                create.getType(),
+                rs.getTimestamp("creation_datetime").toInstant(),
+                create.getUnit()
+        ), ingredientId, create.getUnit().name(), create.getValue(), create.getType().name(), Timestamp.from(now));
     }
 }

@@ -11,6 +11,10 @@ import java.util.List;
 public class Dish {
     private Integer id;
     private String name;
+    private DishTypeEnum dishType;
     private Double unitPrice;
     private List<Ingredient> ingredients;
+
+    public Dish(int dishId, String name, double unitPrice, List<Ingredient> ingredientsByDishId) {
+    }
 }
