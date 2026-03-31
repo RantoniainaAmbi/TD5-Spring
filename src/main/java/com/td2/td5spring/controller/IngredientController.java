@@ -1,8 +1,10 @@
 package com.td2.td5spring.controller;
 
 import com.td2.td5spring.entity.Ingredient;
+import com.td2.td5spring.entity.StockMovement;
 import com.td2.td5spring.entity.StockValue;
 import com.td2.td5spring.repository.IngredientRepository;
+import com.td2.td5spring.repository.StockMovementRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,9 +17,11 @@ import java.util.List;
 @RequestMapping("/ingredients")
 public class IngredientController {
     private final IngredientRepository ingredientRepository;
+    private final StockMovementRepository stockMovementRepository;
 
-    public IngredientController(IngredientRepository ingredientRepository) {
+    public IngredientController(IngredientRepository ingredientRepository, StockMovementRepository stockMovementRepository) {
         this.ingredientRepository = ingredientRepository;
+        this.stockMovementRepository = stockMovementRepository;
     }
 
     @GetMapping
@@ -47,5 +51,20 @@ public class IngredientController {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient.id id=" + id + " is not found"));
 
         return ingredientRepository.getStockValue(id, Instant.from(LocalDateTime.parse(at)), unit);
+    }
+
+    @GetMapping("/{id}/stockMovements")
+    public List<StockMovement> getStockMovements(
+            @PathVariable int id,
+            @RequestParam Instant from,
+            @RequestParam Instant to) {
+
+        ingredientRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Ingredient.id=" + id + " is not found"
+                ));
+
+        return stockMovementRepository.findByIngredientIdAndDateRange(id, from, to);
     }
 }
