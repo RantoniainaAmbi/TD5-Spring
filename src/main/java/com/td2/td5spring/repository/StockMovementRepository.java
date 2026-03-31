@@ -20,19 +20,25 @@ public class StockMovementRepository {
     }
 
     public List<StockMovement> findByIngredientIdAndDateRange(int ingredientId, Instant from, Instant to) {
-        String sql = "SELECT id, creation_datetime, unit, quantity, type " +
+        String sql = "SELECT id, id_ingredient, quantity, unit, type, creation_datetime " +
                 "FROM stock_movement " +
-                "WHERE id_ingredient = ? AND creation_datetime >= ? AND creation_datetime <= ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new StockMovement(
-                rs.getInt("id"),
-                rs.getInt("id_ingredient"),
-                rs.getDouble("quantity"),
-                MovementTypeEnum.valueOf(rs.getString("type").toUpperCase()), // Conversion String -> Enum
-                rs.getTimestamp("creation_datetime").toInstant(),
-                UnitEnum.valueOf(rs.getString("unit").toUpperCase())          // Conversion String -> Enum
-        ), ingredientId, Timestamp.from(from), Timestamp.from(to));
-    }
+                "WHERE id_ingredient = ? " +
+                "AND creation_datetime >= ? " +
+                "AND creation_datetime <= ?";
 
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new StockMovement(
+                        rs.getInt("id"),
+                        rs.getInt("id_ingredient"),
+                        rs.getDouble("quantity"),
+                        MovementTypeEnum.valueOf(rs.getString("type").toUpperCase()),
+                        rs.getTimestamp("creation_datetime").toInstant(),
+                        UnitEnum.valueOf(rs.getString("unit").toUpperCase())
+                ),
+                ingredientId,
+                Timestamp.from(from),
+                Timestamp.from(to)
+        );
+    }
     public StockMovement save(int ingredientId, CreateStockMovement create) {
         String sql = "INSERT INTO stock_movement (id_ingredient, unit, quantity, type, creation_datetime) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING id, creation_datetime";
