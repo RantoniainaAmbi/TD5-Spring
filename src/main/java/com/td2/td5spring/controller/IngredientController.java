@@ -40,18 +40,13 @@ public class IngredientController {
     @GetMapping("/{id}/stock")
     public StockValue getStock(
             @PathVariable int id,
-            @RequestParam(required = false) String at,
-            @RequestParam(required = false) String unit) {
-
-        if (at == null || unit == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Either mandatory query parameter at or unit is not provided.");
-        }
+            @RequestParam Instant date,
+            @RequestParam String unit) {
 
         ingredientRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient.id id=" + id + " is not found"));
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient.id=" + id + " is not found"));
 
-        return ingredientRepository.getStockValue(id, Instant.from(LocalDateTime.parse(at)), unit);
+        return ingredientRepository.getStockValue(id, date, unit);
     }
 
     @GetMapping("/{id}/stockMovements")

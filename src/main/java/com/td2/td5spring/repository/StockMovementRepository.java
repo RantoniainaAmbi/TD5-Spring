@@ -39,6 +39,7 @@ public class StockMovementRepository {
                 Timestamp.from(to)
         );
     }
+
     public StockMovement save(int ingredientId, CreateStockMovement create) {
         String sql = "INSERT INTO stock_movement (id_ingredient, unit, quantity, type, creation_datetime) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING id, creation_datetime";
